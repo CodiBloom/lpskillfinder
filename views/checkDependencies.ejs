@@ -1,0 +1,114 @@
+<%- include("partials/header") %>
+
+<div class="jumbotron centered">
+    <div class="container">
+        <h1>Check depencies of provided skill ID</h1>
+        <hr>
+        <form action="/checkDependencies" method="POST">
+            <div class="form-group">
+                <label for="skillId">Skill ID</label>
+                <input type="text" class="form-control" name="skillId">
+            </div>
+            <div class="form-group">
+                <label for="dependency">Dependency to check</label>
+                <select name="dependency" class="form-control">
+                    <option value="PDC">PDC</option>
+                    <option value="automaticMessages">Auto messages</option>
+                    <option value="users">Users</option>
+                    <option value="engagements">Engagements ** NOT CURRENTLY WORKING, WILL CAUSE ERRORS **</option>
+                    <option value="skills">Transfer restrictions from other skills</option>
+                    <option value="agentSurveys">Agent Surveys ** NOT CURRENTLY WORKING, WILL CAUSE ERRORS **</option>
+                    <option value="PCS">PCS ** NOT CURRENTLY WORKING, WILL CAUSE ERRORS **</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-dark">Check</button>
+        </form>
+    </div>
+    <hr>
+    <div class="container">
+        <% if (responseData != "none") {
+            switch (dependency) {
+                case "PDC": %>
+                    <table class="table table-bordered table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">PDC ID</th>
+                                <th scope="col">Attached skill ID(s)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% responseData.forEach(object => { %>
+                                <tr>
+                                    <td scope="row"><%= object.id %></td>
+                                    <td><%= object.skillIds %></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                    <% break;
+                case "automaticMessages": %>
+                    <table class="table table-bordered table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Auto Message ID</th>
+                                <th scope="col">Attached skill ID(s)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% responseData.forEach(object => { %>
+                                <tr>
+                                    <td scope="row"><%= object.id %></td>
+                                    <td><%= object.skillId %></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                    <% break;
+                case "users": %>
+                    <table class="table table-bordered table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">User ID</th>
+                                <th scope="col">User Login Name</th>
+                                <th scope="col">Skill ID(s)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% responseData.forEach(object => { %>
+                                <tr>
+                                    <td scope="row"><%= object.id %></td>
+                                    <td><%= object.loginName %></td>
+                                    <td><%= object.skillIds %></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                    <% break;
+                case "skills": %>
+                    <table class="table table-bordered table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Skill ID</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Skill transfer list</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% responseData.forEach(object => { %>
+                                <tr>
+                                    <td scope="row"><%= object.id %></td>
+                                    <td><%= object.name %></td>
+                                    <td><%= object.skillTransferList %></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                    <% break;
+                default: %>
+                    <% break;
+            }
+        } %>
+    </div>
+</div>
+
+<%- include("partials/footer") %>
