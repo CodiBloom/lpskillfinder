@@ -12,6 +12,7 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/public"));
 
+// ENV VARIABLES FOR TESTING PURPOSES
 // const username = process.env.loginName;
 // const password = process.env.password;
 // const accountId = process.env.accountId;
@@ -104,7 +105,7 @@ app.route("/checkDependencies")
     res.render("checkDependencies", { responseData: "none" });
 })
 .post(async function(req, res){
-    // ALL APIS FOR THIS REQUEST USE DOMAIN accountConfigReadOnly
+    // ALL APIS FOR THIS REQUEST USE DOMAIN accountConfigReadOnly, EXCEPT THE CAMPAIGN/ENGAGEMENTS REQUESTS WHICH HAVE THEIR HOST HARD-CODED.
 
     const skillId = req.body.skillId;
     const accountId = req.cookies.accountId;
@@ -201,6 +202,7 @@ app.route("/checkDependencies")
                     "Authorization" : "Bearer " + bearer
                 }
             };
+            
             const skillsResponse = await callApi(skillsOptions);
             var filteredArr = skillsResponse.filter(object => object.skillTransferList);
             var finalArr = [];
@@ -214,6 +216,51 @@ app.route("/checkDependencies")
             };
 
             responseData = finalArr;
+
+            break;
+        case "engagements":
+
+            const campaignOptions = {
+                host: "lo.ac.liveperson.net",
+                path: "/api/account/" + accountId + "/configuration/le-campaigns/campaigns?v=3.4",
+                method: "GET",
+                headers: {
+                    "Authorization" : "Bearer " + bearer
+                }
+            };
+
+            const campaignResponse = await callApi(campaignOptions);
+            var filteredArr = [];
+
+            for (const x in campaignResponse) {
+                const campaignId = campaignResponse[x].id;
+
+                const engagementOptions = {
+                    host: "lo.ac.liveperson.net",
+                    path: "/api/account/" + accountId + "/configuration/le-campaigns/campaigns/" + campaignId + "?v=3.4",
+                    method: "GET",
+                    headers: {
+                        "Authorization" : "Bearer " + bearer
+                    }
+                };
+
+                const engagementResponse = await callApi(engagementOptions);
+                const engagements = engagementResponse.engagements;
+
+                for (const x in engagements) {
+                    if (engagements[x].skillId == skillId) {
+                        const matchedEngagement = {
+                            campaignId: campaignId,
+                            engagementId: engagements[x].id,
+                            engagementName: engagements[x].name,
+                            skillId : engagements[x].skillId
+                        };
+                        filteredArr.push(matchedEngagement);
+                    }
+                }
+            }
+
+            responseData = filteredArr;
 
             break;
         default:

@@ -104,6 +104,28 @@
                         </tbody>
                     </table>
                     <% break;
+                case "engagements": %>
+                    <table class="table table-bordered table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Campaign ID</th>
+                                <th scope="col">Engagement ID</th>
+                                <th scope="col">Engagement Name</th>
+                                <th scope="col">Skill ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% responseData.forEach(object => { %>
+                                <tr>
+                                    <td scope="row"><%= object.campaignId %></td>
+                                    <td><%= object.engagementId %></td>
+                                    <td><%= object.engagementName %></td>
+                                    <td><%= object.skillId %></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                    <% break;
                 default: %>
                     <% break;
             }
